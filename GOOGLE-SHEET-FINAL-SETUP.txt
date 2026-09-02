@@ -1,0 +1,42 @@
+বাংলা সংবাদ — Final Google Sheet Setup
+
+A ID
+B Category
+C Headline
+D Details (পুরো খবর)
+E Image1 (ঐচ্ছিক — চাইলে ছবি দিন, না চাইলে ফাঁকা রাখুন)
+F Date
+G Image2 (Optional)
+H Image3 (Optional)
+I Video (Optional)
+
+Homepage/category pages: Details-এর প্রথম ১০টি ভিজ্যুয়াল লাইন পর্যন্ত summary দেখাবে, তারপর “আরও পড়ুন”। Image1, Image2, Image3 — তিনটিই ঐচ্ছিক; কোনো ছবি না দিলেও শুধু খবর প্রকাশ হবে।
+Details page: আগের নিয়ম অনুযায়ী প্রথম ৩০টি Unicode character বাদ দিয়ে বাকি লেখা দেখাবে। Image2 প্রায় ৩০–৪০ লাইন (টার্গেট ৩৫ লাইন) পরে; Image3 ও Video শেষে/পরবর্তী অংশে।
+Category label মোবাইলে ছবির ওপর আর বসবে না; ছবির নিচে সাদা অংশে থাকবে।
+
+
+================ AD SYSTEM (নতুন) ================
+
+একই Google Spreadsheet-এ নতুন একটি tab/Sheet তৈরি করো: Ads
+
+Ads tab-এর ১ম সারি:
+A1 = Position
+B1 = Ad Code
+
+এর নিচে:
+A2 = TOP
+B2 = (Ad network থেকে পাওয়া TOP ad code)
+
+A3 = MIDDLE
+B3 = (Ad network থেকে পাওয়া MIDDLE ad code)
+
+A4 = BOTTOM
+B4 = (Ad network থেকে পাওয়া BOTTOM ad code)
+
+শুধু এই Ads tab-এ code পরিবর্তন করলেই হবে। বিজ্ঞাপনের জন্য index.html বা details.html বারবার GitHub-এ আপডেট করতে হবে না।
+
+গুরুত্বপূর্ণ:
+- Google Spreadsheet-টি অবশ্যই এমনভাবে Share/Publish করতে হবে যাতে ওয়েবসাইট সেটি পড়তে পারে।
+- Ad network-এর code তাদের Terms/Policy অনুযায়ী ব্যবহার করতে হবে।
+- যদি কোনো network dynamicভাবে injected code অনুমোদন না করে, তাদের নির্দেশনা অনুযায়ী static placement প্রয়োজন হতে পারে।
+===================================================

@@ -1138,6 +1138,26 @@ section.news-grid > article:nth-child(6) .news-image img {
 }
 </style>
 
+
+<style id="desktop-news-images-no-crop-final">
+/* Desktop-only fix: preserve the full news image; do not crop Sheet images. Mobile rules remain unchanged. */
+@media (min-width:769px){
+  .news-card img,
+  .news-image img,
+  .news-image-wrap img,
+  .details-container>img,
+  .detail-inline-media img{
+    width:100% !important;
+    height:auto !important;
+    max-height:520px !important;
+    aspect-ratio:auto !important;
+    object-fit:contain !important;
+    object-position:center !important;
+    display:block !important;
+  }
+}
+</style>
+
 </head>
 
 <body>

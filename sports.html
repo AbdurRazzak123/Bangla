@@ -417,6 +417,95 @@ body{background:var(--bn-bg)!important;color:var(--bn-ink)!important;}
 }
 </style>
 
+
+<style id="read-more-button-final-fix">
+/* Match the working Read More button style on all category pages. */
+.read-more-btn{display:inline-block!important;margin-top:10px!important;padding:9px 16px!important;background:var(--bn-green)!important;color:#fff!important;text-decoration:none!important;font-weight:bold!important;border-radius:7px!important;font-size:14px!important;line-height:1.4!important;box-sizing:border-box!important;box-shadow:0 4px 10px rgba(0,106,78,.18)!important;}
+.read-more-btn:hover{background:var(--bn-red)!important;color:#fff!important;}
+</style>
+
+<style id="final-all-pages-theme-sync">
+/* FINAL THEME SYNC: presentation-only. Existing HTML/content/functionality untouched. */
+
+/* Header used by the homepage */
+.site-header{
+  background:linear-gradient(135deg,#004d3a 0%,#006a4e 58%,#0b2f45 100%)!important;
+  border-bottom:4px solid #e31b23!important;
+  box-shadow:0 4px 18px rgba(0,0,0,.14)!important;
+}
+.site-header:before{
+  content:""!important;position:absolute!important;left:0!important;right:0!important;top:0!important;height:4px!important;
+  background:linear-gradient(90deg,#e31b23 0 33%,#f4c542 33% 66%,#16a05d 66% 100%)!important;
+  z-index:1!important;
+}
+.site-header .logo{background:transparent!important;border-radius:0!important;padding:0!important;box-shadow:none!important;}
+.site-header .logo-image,.site-header .site-brand-logo{filter:drop-shadow(0 4px 8px rgba(0,0,0,.22))!important;background:transparent!important;}
+.site-header #live-date{color:#fff!important;background:rgba(0,0,0,.20)!important;border:1px solid rgba(255,255,255,.18)!important;}
+
+/* Existing navigation/menu bar */
+.nav{
+  background:linear-gradient(90deg,#003d2e,#00563f,#08263a)!important;
+  border-bottom:3px solid #e31b23!important;
+  box-shadow:0 4px 12px rgba(0,0,0,.18)!important;
+}
+.nav-inner{background:transparent!important;}
+.nav a{
+  color:#fff!important;
+  font-weight:700!important;
+  transition:all .18s ease!important;
+}
+.nav a:hover,.nav a.active{
+  background:#e31b23!important;
+  color:#fff!important;
+  transform:translateY(-1px)!important;
+}
+
+/* Existing inner-page logo/header bar */
+.brand-header{
+  position:relative!important;
+  background:linear-gradient(135deg,#004d3a 0%,#006a4e 58%,#0b2f45 100%)!important;
+  border-bottom:4px solid #e31b23!important;
+  box-shadow:0 4px 18px rgba(0,0,0,.14)!important;
+}
+.brand-header:before{
+  content:""!important;position:absolute!important;left:0!important;right:0!important;top:0!important;height:4px!important;
+  background:linear-gradient(90deg,#e31b23 0 33%,#f4c542 33% 66%,#16a05d 66% 100%)!important;
+}
+.brand-header .site-brand-logo{
+  background:transparent!important;
+  filter:drop-shadow(0 4px 8px rgba(0,0,0,.24))!important;
+}
+.brand-header .back-btn{
+  background:#e31b23!important;
+  color:#fff!important;
+  border:1px solid rgba(255,255,255,.25)!important;
+  border-radius:7px!important;
+  padding:7px 13px!important;
+  font-weight:700!important;
+  text-decoration:none!important;
+  box-shadow:0 3px 8px rgba(0,0,0,.16)!important;
+}
+.brand-header .back-btn:hover{
+  background:#006a4e!important;
+  color:#fff!important;
+}
+
+/* Existing footer */
+.site-footer{
+  background:linear-gradient(135deg,#0b2638 0%,#071b2a 100%)!important;
+  color:#fff!important;
+  border-top:4px solid #006a4e!important;
+  box-shadow:0 -4px 18px rgba(0,0,0,.10)!important;
+}
+.site-footer h3{color:#fff!important;}
+.site-footer p{color:#dbe7ed!important;}
+.site-footer a{color:#fff!important;}
+.site-footer a:hover{color:#f4c542!important;text-decoration:none!important;}
+@media(max-width:768px){
+  .brand-header .back-btn{padding:6px 10px!important;font-size:13px!important;}
+}
+</style>
+
 </head>
 <body>
 <div class="news-ticker" aria-label="সর্বশেষ বার্তা"><div class="news-ticker-label">বিশেষ বার্তা</div><div class="news-ticker-track"><span class="news-ticker-text">সত্য ও নির্ভরযোগ্য সংবাদ জানতে চোখ রাখুন বাংলা সংবাদের সঙ্গে—তথ্য যাচাই করে, দায়িত্বশীলতার সঙ্গে প্রতিটি গুরুত্বপূর্ণ খবর পৌঁছে দিতে আমরা আছি আপনাদের পাশে।</span></div></div>

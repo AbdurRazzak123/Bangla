@@ -530,6 +530,97 @@ body{background:var(--bn-bg)!important;color:var(--bn-ink)!important;}
 }
 </style>
 
+
+<style id="final-desktop-news-no-crop-v2">
+/* FINAL V2: Desktop news images keep their original aspect ratio; only the six homepage category cards keep their fixed 410x170 frame. */
+@media (min-width:769px){
+  .news-grid .news-card .news-image-wrap,
+  .news-grid .news-card .news-primary-image,
+  .news-grid .news-card .news-image-top,
+  #news-grid .news-image-wrap,
+  #news-container .news-image-wrap,
+  #news-grid .news-primary-image,
+  #news-container .news-primary-image {
+    width:100% !important;
+    height:auto !important;
+    max-height:none !important;
+    overflow:visible !important;
+  }
+  .news-grid .news-card .news-image-wrap img,
+  .news-grid .news-card .news-primary-image img,
+  .news-grid .news-card .news-image-top img,
+  #news-grid .news-image-wrap img,
+  #news-container .news-image-wrap img,
+  #news-grid .news-primary-image img,
+  #news-container .news-primary-image img {
+    display:block !important;
+    width:100% !important;
+    height:auto !important;
+    max-height:none !important;
+    aspect-ratio:auto !important;
+    object-fit:contain !important;
+    object-position:center !important;
+  }
+}
+</style>
+
+<style id="universal-any-image-no-crop-final">
+/* Universal image handling: any Google Sheet / dynamic news image keeps its original aspect ratio.
+   No manual width/height is required and no part of the image is cropped. */
+.news-grid .news-card .news-image-wrap,
+.news-grid .news-card .news-image-top,
+#news-grid .news-image-wrap,
+#news-container .news-image-wrap,
+.news-image-wrap,
+.news-image-top,
+.sheet-media-gallery,
+.inline-media,
+.detail-inline-media,
+.reader-inline-media {
+  height:auto!important;
+  min-height:0!important;
+  max-height:none!important;
+  aspect-ratio:auto!important;
+  overflow:visible!important;
+}
+.news-grid .news-card .news-image-wrap img,
+.news-grid .news-card .news-image-top img,
+#news-grid .news-image-wrap img,
+#news-container .news-image-wrap img,
+.news-image-wrap img,
+.news-image-top img,
+.sheet-media-gallery img,
+.inline-media img,
+.detail-inline-media img,
+.reader-inline-media img,
+.details-container>img {
+  display:block!important;
+  width:100%!important;
+  height:auto!important;
+  min-height:0!important;
+  max-height:none!important;
+  aspect-ratio:auto!important;
+  object-fit:contain!important;
+  object-position:center!important;
+}
+@media(max-width:768px){
+  .news-grid .news-card .news-image-wrap,
+  .news-grid .news-card .news-image-top,
+  #news-grid .news-image-wrap,
+  #news-container .news-image-wrap,
+  .news-image-wrap, .news-image-top {
+    height:auto!important; max-height:none!important; aspect-ratio:auto!important; overflow:visible!important;
+  }
+  .news-grid .news-card .news-image-wrap img,
+  .news-grid .news-card .news-image-top img,
+  #news-grid .news-image-wrap img,
+  #news-container .news-image-wrap img,
+  .news-image-wrap img, .news-image-top img {
+    width:100%!important; height:auto!important; max-height:none!important; aspect-ratio:auto!important; object-fit:contain!important;
+  }
+}
+</style>
+
 </head>
 <body>
 <div class="news-ticker" aria-label="সর্বশেষ বার্তা"><div class="news-ticker-label">বিশেষ বার্তা</div><div class="news-ticker-track"><span class="news-ticker-text">সত্য ও নির্ভরযোগ্য সংবাদ জানতে চোখ রাখুন বাংলা সংবাদের সঙ্গে—তথ্য যাচাই করে, দায়িত্বশীলতার সঙ্গে প্রতিটি গুরুত্বপূর্ণ খবর পৌঁছে দিতে আমরা আছি আপনাদের পাশে।</span></div></div>

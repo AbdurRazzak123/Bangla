@@ -1279,6 +1279,87 @@ section.news-grid > article:nth-child(6) .news-image img {
 }
 </style>
 
+
+<style id="final-news-content-narrow-full-image">
+/* Final listing-page width: slightly narrower content so the full image is visible cleanly. Details page is untouched. */
+@media (min-width:769px){
+  .container:has(#news-grid),
+  .container:has(#news-container){
+    width:92% !important;
+    max-width:1050px !important;
+    margin-left:auto !important;
+    margin-right:auto !important;
+    box-sizing:border-box !important;
+  }
+  #news-grid .news-image-wrap,
+  #news-container .news-image-wrap,
+  .news-grid .news-card .news-image-wrap,
+  .news-grid .news-card .news-image-top,
+  .vertical-news-block .news-image-top{
+    width:100% !important;
+    max-width:100% !important;
+    height:auto !important;
+    max-height:none !important;
+    margin-left:0 !important;
+    margin-right:0 !important;
+    overflow:visible !important;
+  }
+  #news-grid .news-image-wrap img,
+  #news-container .news-image-wrap img,
+  .news-grid .news-card .news-image-wrap img,
+  .news-grid .news-card .news-image-top img,
+  .vertical-news-block .news-image-top img{
+    display:block !important;
+    width:100% !important;
+    height:auto !important;
+    max-width:100% !important;
+    max-height:none !important;
+    aspect-ratio:auto !important;
+    object-fit:contain !important;
+    object-position:center !important;
+  }
+}
+</style>
+
+
+<style id="index-breaking-image-final">
+/* Index featured/breaking news: full natural image, taller content, three-line summary. */
+@media (min-width:769px){
+  .vertical-news-block{
+    width:100%!important;
+    max-width:none!important;
+    box-sizing:border-box!important;
+  }
+  .vertical-news-block .news-image-top{
+    width:100%!important;
+    height:auto!important;
+    max-height:none!important;
+    aspect-ratio:auto!important;
+    overflow:visible!important;
+    margin:0!important;
+  }
+  .vertical-news-block .news-image-top img{
+    display:block!important;
+    width:100%!important;
+    height:auto!important;
+    max-width:100%!important;
+    max-height:none!important;
+    aspect-ratio:auto!important;
+    object-fit:contain!important;
+    object-position:center!important;
+  }
+}
+.vertical-news-block .news-text-bottom .home-summary{
+  display:-webkit-box!important;
+  -webkit-box-orient:vertical!important;
+  -webkit-line-clamp:3!important;
+  line-clamp:3!important;
+  overflow:hidden!important;
+  line-height:1.85!important;
+  min-height:5.55em!important;
+  max-height:5.55em!important;
+}
+</style>
 </head>
 
 <body>

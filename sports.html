@@ -704,6 +704,82 @@ body{background:var(--bn-bg)!important;color:var(--bn-ink)!important;}
 }
 </style>
 
+
+<style id="final-news-image-full-width-natural-height">
+/* Final image sizing: fill the existing news area on desktop; keep the image uncropped.
+   Height remains automatic, so a wider image becomes naturally taller. Details page untouched. */
+@media (min-width:769px){
+  #news-grid .news-image-wrap,
+  #news-container .news-image-wrap,
+  .news-grid .news-card .news-image-wrap,
+  .news-grid .news-card .news-image-top,
+  .vertical-news-block .news-image-top {
+    width:calc(100% + 40px) !important;
+    max-width:none !important;
+    height:auto !important;
+    max-height:none !important;
+    margin-left:-20px !important;
+    margin-right:-20px !important;
+    overflow:visible !important;
+  }
+  #news-grid .news-image-wrap img,
+  #news-container .news-image-wrap img,
+  .news-grid .news-card .news-image-wrap img,
+  .news-grid .news-card .news-image-top img,
+  .vertical-news-block .news-image-top img {
+    display:block !important;
+    width:100% !important;
+    height:auto !important;
+    max-width:none !important;
+    max-height:none !important;
+    aspect-ratio:auto !important;
+    object-fit:contain !important;
+    object-position:center !important;
+  }
+}
+</style>
+
+<style id="final-news-content-narrow-full-image">
+/* Final listing-page width: slightly narrower content so the full image is visible cleanly. Details page is untouched. */
+@media (min-width:769px){
+  .container:has(#news-grid),
+  .container:has(#news-container){
+    width:92% !important;
+    max-width:1050px !important;
+    margin-left:auto !important;
+    margin-right:auto !important;
+    box-sizing:border-box !important;
+  }
+  #news-grid .news-image-wrap,
+  #news-container .news-image-wrap,
+  .news-grid .news-card .news-image-wrap,
+  .news-grid .news-card .news-image-top,
+  .vertical-news-block .news-image-top{
+    width:100% !important;
+    max-width:100% !important;
+    height:auto !important;
+    max-height:none !important;
+    margin-left:0 !important;
+    margin-right:0 !important;
+    overflow:visible !important;
+  }
+  #news-grid .news-image-wrap img,
+  #news-container .news-image-wrap img,
+  .news-grid .news-card .news-image-wrap img,
+  .news-grid .news-card .news-image-top img,
+  .vertical-news-block .news-image-top img{
+    display:block !important;
+    width:100% !important;
+    height:auto !important;
+    max-width:100% !important;
+    max-height:none !important;
+    aspect-ratio:auto !important;
+    object-fit:contain !important;
+    object-position:center !important;
+  }
+}
+</style>
+
 </head>
 <body>
 <div class="news-ticker" aria-label="সর্বশেষ বার্তা"><div class="news-ticker-label">বিশেষ বার্তা</div><div class="news-ticker-track"><span class="news-ticker-text">সত্য ও নির্ভরযোগ্য সংবাদ জানতে চোখ রাখুন বাংলা সংবাদের সঙ্গে—তথ্য যাচাই করে, দায়িত্বশীলতার সঙ্গে প্রতিটি গুরুত্বপূর্ণ খবর পৌঁছে দিতে আমরা আছি আপনাদের পাশে।</span></div></div>

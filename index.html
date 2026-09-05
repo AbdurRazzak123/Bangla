@@ -1360,6 +1360,32 @@ section.news-grid > article:nth-child(6) .news-image img {
   max-height:5.55em!important;
 }
 </style>
+
+<style id="all-listing-pages-width-1050">
+/* Listing pages: 1050px content width. Details page is intentionally excluded. */
+@media (min-width:769px){
+  .container{width:92% !important; max-width:1050px !important; margin-left:auto !important; margin-right:auto !important; box-sizing:border-box !important;}
+}
+/* Google Sheet news order: image → date → headline → details */
+.news-grid .news-card{display:flex;flex-direction:column;}
+.news-grid .news-card .news-image-wrap,.news-grid .news-card .news-image-top,.vertical-news-block .news-image-top{order:1;}
+.news-grid .news-card .news-details,.vertical-news-block .news-text-bottom{order:2;}
+.news-grid .news-card .news-details{display:flex;flex-direction:column;}
+.news-grid .news-card .news-details .news-date{order:1;}
+.news-grid .news-card .news-details h2,.news-grid .news-card .news-details h3{order:2;}
+.news-grid .news-card .news-details .home-summary,.news-grid .news-card .news-details .news-summary{order:3;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden;line-height:1.75;}
+.news-grid .news-card .news-details .read-more-btn{order:4;align-self:flex-start;}
+.vertical-news-block .news-text-bottom{display:flex;flex-direction:column;}
+.vertical-news-block .news-text-bottom .breaking-news-date{order:1;}
+.vertical-news-block .news-text-bottom h3{order:2;}
+.vertical-news-block .news-text-bottom .home-summary{order:3;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden;}
+.vertical-news-block .news-text-bottom .read-more-btn{order:4;align-self:flex-start;}
+@media (min-width:769px){
+  .news-grid .news-card .news-image-wrap,.news-grid .news-card .news-image-top,.vertical-news-block .news-image-top{width:100% !important;max-width:100% !important;height:auto !important;max-height:none !important;margin-left:0 !important;margin-right:0 !important;overflow:visible !important;}
+  .news-grid .news-card .news-image-wrap img,.news-grid .news-card .news-image-top img,.vertical-news-block .news-image-top img{width:100% !important;height:auto !important;max-width:100% !important;max-height:none !important;aspect-ratio:auto !important;object-fit:contain !important;object-position:center !important;display:block !important;}
+}
+</style>
+
 </head>
 
 <body>
@@ -1507,7 +1533,7 @@ function imageUrl(url){
 }
 
 function image1(n){return n.image?`<div class="news-image-wrap"><img loading="lazy" src="${esc(imageUrl(n.image))}" alt="${esc(n.title)}" onerror="this.closest('.news-image-wrap')?.remove()"></div>`:'';}
-function card(n,catLabel){return `<div class="news-card" id="news-${esc(n.id)}">${image1(n)}<div class="news-details"><span class="category-tag">${esc(catLabel||n.category)}</span><span class="news-date">${esc(n.date)}</span><h3>${esc(n.title)}</h3><p class="home-summary">${esc(n.summary)}</p><a class="read-more-btn" href="details.html?id=${encodeURIComponent(n.id)}" data-news-id="${esc(n.id)}">আরও পড়ুন</a></div></div>`;}
+function card(n,catLabel){return `<div class="news-card" id="news-${esc(n.id)}">${image1(n)}<div class="news-details"><span class="news-date">${esc(n.date)}</span><h3>${esc(n.title)}</h3><p class="home-summary">${esc(n.summary)}</p><a class="read-more-btn" href="details.html?id=${encodeURIComponent(n.id)}" data-news-id="${esc(n.id)}">আরও পড়ুন</a></div></div>`;}
 function latest(list){return [...list].reverse();}
 
 load().then(list=>{const c=document.getElementById('news-container');const newest=latest(list)[0];if(c&&newest){const chars=Array.from(newest.summary||'');const preview=chars.length>700?chars.slice(0,700).join('')+'...':chars.join('');c.innerHTML=`<div class="vertical-news-block" id="news-${esc(newest.id)}">${newest.image?`<div class="news-image-top"><img loading="lazy" src="${esc(imageUrl(newest.image))}" alt="${esc(newest.title)}" onerror="this.remove()"></div>`:''}<div class="news-text-bottom"><span class="category-tag">${esc(newest.category)}</span><div class="breaking-news-date">${esc(newest.date)}</div><h3>${esc(newest.title)}</h3><p class="home-summary">${esc(preview)}</p><a href="details.html?id=${encodeURIComponent(newest.id)}" data-news-id="${esc(newest.id)}" class="read-more-btn">আরও পড়ুন</a></div></div>`;}const ticker=document.querySelector('.breaking .ticker-track');if(ticker&&newest)ticker.textContent=newest.title;const lc=document.getElementById('latest-news-container');if(lc)lc.innerHTML=latest(list).slice(0,10).map(n=>`<div class="latest-item"><a href="home.html?id=${encodeURIComponent(n.id)}#news-${encodeURIComponent(n.id)}" data-news-id="${esc(n.id)}">🔺 ${esc(n.title)}</a></div>`).join('');}).catch(e=>console.error(e));

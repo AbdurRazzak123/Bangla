@@ -1249,6 +1249,89 @@ section.news-grid > article:nth-child(6) .news-image img {
 }
 </style>
 
+
+<style id="desktop-news-images-no-crop-clean">
+/* Desktop/Laptop only: show complete news images without cropping. Mobile CSS is intentionally unchanged. */
+@media (min-width: 769px) {
+  .news-grid .news-card,
+  #news-grid .news-card,
+  #news-container .news-card,
+  .vertical-news-block {
+    overflow: visible !important;
+  }
+
+  .news-grid .news-card .news-image-wrap,
+  .news-grid .news-card .news-image,
+  #news-grid .news-card .news-image-wrap,
+  #news-container .news-card .news-image-wrap,
+  .vertical-news-block .news-image-top {
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    aspect-ratio: auto !important;
+    overflow: visible !important;
+  }
+
+  .news-grid .news-card > img,
+  .news-grid .news-card .news-image img,
+  .news-grid .news-card .news-image-wrap img,
+  #news-grid .news-card img:not(.site-brand-logo),
+  #news-container .news-card img:not(.site-brand-logo),
+  #news-container img:not(.site-brand-logo),
+  .vertical-news-block .news-image-top img {
+    display: block !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    aspect-ratio: auto !important;
+    object-fit: contain !important;
+    object-position: center !important;
+  }
+}
+</style>
+
+<style id="desktop-full-image-max450">
+/* FINAL DESKTOP IMAGE SIZE: full image, maximum height 450px, no crop */
+@media (min-width: 769px) {
+  /* Image containers: no fixed frame and no clipping */
+  .news-grid .news-card .news-image,
+  .news-grid .news-card .news-image-wrap,
+  .news-grid .news-card .news-image-top,
+  #news-grid .news-image,
+  #news-grid .news-image-wrap,
+  #news-container .news-image,
+  #news-container .news-image-wrap,
+  .news-image, .news-image-wrap, .news-image-top {
+    width:100% !important;
+    height:auto !important;
+    min-height:0 !important;
+    max-height:450px !important;
+    aspect-ratio:auto !important;
+    overflow:visible !important;
+  }
+  /* Images: preserve the complete source image */
+  .news-grid .news-card .news-image img,
+  .news-grid .news-card .news-image-wrap img,
+  .news-grid .news-card .news-image-top img,
+  #news-grid .news-image img,
+  #news-grid .news-image-wrap img,
+  #news-container .news-image img,
+  #news-container .news-image-wrap img,
+  .news-image img, .news-image-wrap img, .news-image-top img,
+  .news-card img, .news-item img, .article-card img, .category-card img {
+    display:block !important;
+    width:100% !important;
+    height:auto !important;
+    min-height:0 !important;
+    max-height:450px !important;
+    aspect-ratio:auto !important;
+    object-fit:contain !important;
+    object-position:center !important;
+  }
+}
+</style>
 </head>
 
 <body>
@@ -1407,7 +1490,7 @@ load().then(list=>{const c=document.getElementById('news-container');const newes
 <div class="ad-slot footer-ad sheet-ad-slot bottom" data-ad-slot="bottom" aria-label="বিজ্ঞাপন"></div>
 
 <footer class="site-footer"><h3>বাংলা সংবাদ</h3><p>সর্বশেষ সংবাদ সবার আগে</p><div class="links"><a href="about.html">আমাদের সম্পর্কে</a><a href="contact.html">যোগাযোগ</a><a href="privacy.html">গোপনীয়তা নীতি</a><a href="disclaimer.html">দাবিত্যাগ</a></div><p>© ২০২৬ বাংলা সংবাদ — সর্বস্বত্ব সংরক্ষিত</p></footer>
-<script src="ads-loader.js"></script>
+<script src="ads-loader.js?v=20260906-ads-v4"></script>
 <script src="news-media.js"></script>
 
 

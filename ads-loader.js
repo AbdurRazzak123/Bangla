@@ -43,121 +43,21 @@ function imageAd(img,click,title){
   const image='<img src="'+esc(src)+'" alt="'+alt+'" loading="lazy" style="display:block;width:100%;height:auto;max-width:100%;object-fit:contain;border:0;margin:0;padding:0">';
   return href?'<a href="'+esc(href)+'" target="_blank" rel="noopener noreferrer" style="display:block;width:100%;height:auto;text-decoration:none">'+image+'</a>':image;
 }
-function makeAdFrame(code,title){
-  // Keep the ad creative on the exact same fixed desktop canvas on every device.
-  // Mobile only scales the complete canvas; the creative itself must never reflow.
-  const DESIGN_WIDTH=1200;
-  const wrap=document.createElement('div');
-  wrap.className='sheet-ad-code-wrap';
-  wrap.style.cssText='position:relative;width:100%;max-width:100%;height:0;margin:0 auto;padding:0;overflow:hidden;display:block;line-height:0;box-sizing:border-box;';
-
-  const iframe=document.createElement('iframe');
-  iframe.title=String(title||'Advertisement');
-  iframe.setAttribute('aria-label',String(title||'Advertisement'));
-  iframe.setAttribute('scrolling','no');
-  iframe.setAttribute('frameborder','0');
-  iframe.style.cssText='display:block;position:absolute;left:0;top:0;width:'+DESIGN_WIDTH+'px!important;min-width:'+DESIGN_WIDTH+'px!important;max-width:none!important;height:250px;border:0;margin:0;padding:0;background:transparent;overflow:hidden;transform-origin:top left;will-change:transform;';
-
-  const doc='<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width='+DESIGN_WIDTH+',initial-scale=1,maximum-scale=1,user-scalable=no"><style>html,body{width:'+DESIGN_WIDTH+'px!important;min-width:'+DESIGN_WIDTH+'px!important;max-width:'+DESIGN_WIDTH+'px!important;margin:0!important;padding:0!important;overflow:hidden!important;}*{box-sizing:border-box;}</style></head><body style="width:'+DESIGN_WIDTH+'px;min-width:'+DESIGN_WIDTH+'px;max-width:'+DESIGN_WIDTH+'px;margin:0;padding:0;overflow:hidden;line-height:normal;">'+String(code||'')+'</body></html>';
-  iframe.srcdoc=doc;
-  wrap.appendChild(iframe);
-
-  let lastRawH=250;
-  const getVisualHeight=()=>{
-    const d=iframe.contentDocument;
-    if(!d||!d.body)return 0;
-    let h=0;
-    const bodyRect=d.body.getBoundingClientRect();
-    h=Math.max(h,bodyRect.height||0);
-    const els=d.body.querySelectorAll('*');
-    for(let i=0;i<els.length;i++){
-      const el=els[i];
-      try{
-        const cs=d.defaultView.getComputedStyle(el);
-        if(cs.display==='none'||cs.visibility==='hidden'||parseFloat(cs.opacity||'1')===0)continue;
-        const r=el.getBoundingClientRect();
-        if(r.width>0&&r.height>0&&r.bottom>0)h=Math.max(h,r.bottom);
-      }catch(e){}
-    }
-    return h;
-  };
-
-  const fit=()=>{
-    try{
-      const available=Math.max(1,wrap.clientWidth||DESIGN_WIDTH);
-      // The ONLY mobile adaptation: scale the complete desktop canvas.
-      const scale=Math.min(1,available/DESIGN_WIDTH);
-      iframe.style.transform='scale('+scale+')';
-
-      const d=iframe.contentDocument;
-      const visualH=getVisualHeight();
-      const scrollH=Math.max(
-        Math.ceil((d&&d.documentElement&&d.documentElement.scrollHeight)||0),
-        Math.ceil((d&&d.body&&d.body.scrollHeight)||0)
-      );
-      // Prefer actual visible content. Never let a previously measured giant
-      // blank canvas keep the slot hundreds of pixels tall.
-      let rawH=Math.max(90,Math.ceil(visualH||0));
-      if(!visualH) rawH=Math.max(90,Math.min(900,Math.ceil(scrollH||0)||250));
-      rawH=Math.min(900,rawH);
-      lastRawH=rawH;
-      iframe.style.height=rawH+'px';
-      wrap.style.height=Math.ceil(rawH*scale)+'px';
-      wrap.style.minHeight=Math.ceil(90*scale)+'px';
-    }catch(e){
-      const available=Math.max(1,wrap.clientWidth||DESIGN_WIDTH);
-      const scale=Math.min(1,available/DESIGN_WIDTH);
-      iframe.style.transform='scale('+scale+')';
-      iframe.style.height=lastRawH+'px';
-      wrap.style.height=Math.ceil(lastRawH*scale)+'px';
-    }
-  };
-
-  iframe.addEventListener('load',()=>{
-    fit();
-    setTimeout(fit,150);
-    setTimeout(fit,500);
-    setTimeout(fit,1200);
-    setTimeout(fit,2500);
-    setTimeout(fit,5000);
-    try{
-      const d=iframe.contentDocument;
-      if(window.ResizeObserver&&d&&d.body){
-        const innerRO=new ResizeObserver(fit);
-        innerRO.observe(d.body);
-      }
-    }catch(e){}
+function runScripts(slot){
+  slot.querySelectorAll('script').forEach(old=>{
+    const s=document.createElement('script');
+    for(const a of old.attributes)s.setAttribute(a.name,a.value);
+    if(old.src){s.src=old.src;s.async=old.async;s.defer=old.defer;}
+    else s.text=old.text||old.textContent||'';
+    old.replaceWith(s);
   });
-  if(window.ResizeObserver){
-    const ro=new ResizeObserver(fit);
-    ro.observe(wrap);
-  }else{
-    window.addEventListener('resize',fit,{passive:true});
-  }
-  setTimeout(fit,0);
-  return wrap;
-}
-
-function imageAdNode(slot,img,click,title){
-  const src=safeUrl(img),href=safeUrl(click),alt=esc(title||'Advertisement');
-  if(!src)return false;
-  const image=document.createElement('img');
-  image.src=src; image.alt=title||'Advertisement'; image.loading='lazy';
-  image.style.cssText='display:block;width:100%;height:auto;max-width:100%;object-fit:contain;border:0;margin:0;padding:0;';
-  if(href){
-    const a=document.createElement('a'); a.href=href; a.target='_blank'; a.rel='noopener noreferrer';
-    a.style.cssText='display:block;width:100%;height:auto;text-decoration:none;'; a.appendChild(image); slot.appendChild(a);
-  }else slot.appendChild(image);
-  return true;
 }
 function render(slot,ad){
   if(!ad)return false;
-  slot.innerHTML='';
-  if(ad.code){
-    slot.appendChild(makeAdFrame(ad.code,ad.title));
-  }else if(!imageAdNode(slot,ad.image,ad.click,ad.title)){
-    return false;
-  }
+  const content=ad.code||imageAd(ad.image,ad.click,ad.title);
+  if(!content)return false;
+  slot.innerHTML=content;
+  runScripts(slot);
   slot.classList.add('ad-loaded');
   slot.setAttribute('data-ad-loaded','yes');
   return true;
@@ -172,36 +72,38 @@ function getSlots(){
   });
 }
 function mapSlots(slots){
-  const explicit=slots.map(canonicalSlotPosition);
-  // Explicit position attributes are authoritative. This is used by Details,
-  // whose four slots are TOP/MIDDLE TOP/MIDDLE BOTTOM/BOTTOM.
-  if(explicit.every(Boolean))return explicit;
   const count=slots.length;
+  const explicit=slots.some(s=>/^(MIDDLE_TOP|MIDDLE_BOTTOM)$/i.test(canonicalSlotPosition(s)));
+  if(explicit)return slots.map(s=>canonicalSlotPosition(s));
   if(count===2)return ['TOP','BOTTOM'];
   if(count===3)return ['TOP','MIDDLE','BOTTOM'];
-  if(count===4)return ['TOP','MIDDLE_TOP','MIDDLE_BOTTOM','BOTTOM'];
+  if(count===4)return ['TOP','MIDDLE','MIDDLE','BOTTOM'];
   return [];
 }
 function pick(adSets,pos,used){
-  // Exact position first.
-  let list=adSets[pos]||[];
+  // 1) Exact position is always preferred.
+  let key=pos;
+  let list=adSets[key]||[];
   if(list.length){
-    // A position can contain multiple active rows. Cycle through them per page.
-    const i=used[pos]||0; used[pos]=i+1;
-    return list[i%list.length];
+    const i=used[key]||0;
+    used[key]=i+1;
+    return list[i]||list[0];
   }
-  // ALL is intentionally reusable: one row can power every slot.
+  // 2) One explicit ALL row can be reused independently in every slot.
   list=adSets.ALL||[];
-  if(list.length)return list[0];
-  // Legacy MIDDLE row supports the single MIDDLE slot on index.html.
-  if(pos==='MIDDLE'){
-    list=adSets.MIDDLE||[];
-    if(list.length)return list[0];
+  if(list.length){
+    const i=used.ALL||0;
+    used.ALL=i+1;
+    return list[i]||list[0];
   }
-  // Legacy MIDDLE rows can also fill a missing middle-specific row.
+  // 3) Legacy MIDDLE row is a fallback for either middle position.
   if(pos==='MIDDLE_TOP'||pos==='MIDDLE_BOTTOM'){
     list=adSets.MIDDLE||[];
-    if(list.length){const i=used.MIDDLE||0;used.MIDDLE=i+1;return list[i%list.length];}
+    if(list.length){
+      const i=used.MIDDLE||0;
+      used.MIDDLE=i+1;
+      return list[i]||list[0];
+    }
   }
   return null;
 }

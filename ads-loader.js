@@ -2,29 +2,29 @@
    Ads tab columns:
    A Position | B Active | C Image URL | D Click URL | E Title | F Ad Code
 
-   Supported page layouts:
-   2 slots = TOP, BOTTOM
-   3 slots = TOP, MIDDLE, BOTTOM
-   4 slots = TOP, MIDDLE TOP, MIDDLE BOTTOM, BOTTOM
-
-   Supported Position values in Google Sheet:
-   TOP, MIDDLE, MIDDLE TOP, MIDDLE BOTTOM, BOTTOM, ALL
-
-   IMPORTANT:
-   - The same ad/video/code can be used in all four positions by putting the
-     same ad in each of the four rows, OR by using one row with Position=ALL.
-   - Different companies can use four separate rows: TOP, MIDDLE TOP,
-     MIDDLE BOTTOM, BOTTOM.
-   - Exact position rows always have priority over ALL/fallback rows.
+   This version keeps the whole website responsive. ONLY the ad creative is
+   placed on a fixed 1200px desktop canvas and scaled down on small screens.
 */
 (function(){
 'use strict';
 const SHEET_ID='1gX73WskIs3D-8IcyPJ24NT0xn1KIEJSjMXOF9nCQqTg';
-const URL='https://docs.google.com/spreadsheets/d/'+SHEET_ID+'/gviz/tq?tqx=out:json&sheet=Ads';
+const SHEET_URL='https://docs.google.com/spreadsheets/d/'+SHEET_ID+'/gviz/tq?tqx=out:json&sheet=Ads';
+const DESIGN_WIDTH=1200;
+const NATIVE_HOST='closurenosy.com';
+
 const val=(r,i)=>r&&r.c&&r.c[i]&&r.c[i].v!=null?String(r.c[i].v).trim():'';
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
-function parse(raw){const a=raw.indexOf('{'),b=raw.lastIndexOf('}')+1;if(a<0||b<=a)throw Error('Invalid Ads response');const d=JSON.parse(raw.slice(a,b));return d.table&&Array.isArray(d.table.rows)?d.table.rows:[];}
-function active(v){v=String(v||'').toLowerCase().trim();return !v||['yes','true','1','active','on','হ্যাঁ','চালু'].includes(v);}
+
+function parse(raw){
+  const a=raw.indexOf('{'), b=raw.lastIndexOf('}')+1;
+  if(a<0||b<=a) throw new Error('Invalid Google Sheet response');
+  const d=JSON.parse(raw.slice(a,b));
+  return d.table&&Array.isArray(d.table.rows)?d.table.rows:[];
+}
+function isActive(v){
+  v=String(v||'').toLowerCase().trim();
+  return !v||['yes','true','1','active','on','হ্যাঁ','চালু'].includes(v);
+}
 function normalizePosition(v){
   const p=String(v||'').toUpperCase().trim().replace(/[-_]+/g,' ').replace(/\s+/g,' ');
   if(p==='TOP') return 'TOP';
@@ -35,218 +35,215 @@ function normalizePosition(v){
   if(p==='ALL'||p==='EVERYWHERE'||p==='ALL POSITIONS') return 'ALL';
   return '';
 }
-function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
-function safeUrl(s){const u=String(s||'').trim();return /^(https?:|mailto:|tel:)/i.test(u)?u:'';}
-function imageAd(img,click,title){
-  const src=safeUrl(img),href=safeUrl(click),alt=esc(title||'Advertisement');
-  if(!src)return '';
-  const image='<img src="'+esc(src)+'" alt="'+alt+'" loading="lazy" style="display:block;width:100%;height:auto;max-width:100%;object-fit:contain;border:0;margin:0;padding:0">';
-  return href?'<a href="'+esc(href)+'" target="_blank" rel="noopener noreferrer" style="display:block;width:100%;height:auto;text-decoration:none">'+image+'</a>':image;
+function safeUrl(s){
+  const u=String(s||'').trim();
+  return /^(https?:|mailto:|tel:)/i.test(u)?u:'';
 }
-function makeAdFrame(code,title){
-  // Keep the ad creative on the exact same fixed desktop canvas on every device.
-  // Mobile only scales the complete canvas; the creative itself must never reflow.
-  const DESIGN_WIDTH=1200;
-  const wrap=document.createElement('div');
-  wrap.className='sheet-ad-code-wrap';
-  wrap.style.cssText='position:relative;width:100%;max-width:100%;height:0;margin:0 auto;padding:0;overflow:hidden;display:block;line-height:0;box-sizing:border-box;';
+function escapeHtml(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
 
-  const iframe=document.createElement('iframe');
-  iframe.title=String(title||'Advertisement');
-  iframe.setAttribute('aria-label',String(title||'Advertisement'));
-  iframe.setAttribute('scrolling','no');
-  iframe.setAttribute('frameborder','0');
-  iframe.style.cssText='display:block;position:absolute;left:0;top:0;width:'+DESIGN_WIDTH+'px!important;min-width:'+DESIGN_WIDTH+'px!important;max-width:none!important;height:250px;border:0;margin:0;padding:0;background:transparent;overflow:hidden;transform-origin:top left;will-change:transform;';
-
-  const doc='<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width='+DESIGN_WIDTH+',initial-scale=1,maximum-scale=1,user-scalable=no"><style>html,body{width:'+DESIGN_WIDTH+'px!important;min-width:'+DESIGN_WIDTH+'px!important;max-width:'+DESIGN_WIDTH+'px!important;margin:0!important;padding:0!important;overflow:hidden!important;}*{box-sizing:border-box;}</style></head><body style="width:'+DESIGN_WIDTH+'px;min-width:'+DESIGN_WIDTH+'px;max-width:'+DESIGN_WIDTH+'px;margin:0;padding:0;overflow:hidden;line-height:normal;">'+String(code||'')+'</body></html>';
-  iframe.srcdoc=doc;
-  wrap.appendChild(iframe);
-
-  let lastRawH=250;
-  const getVisualHeight=()=>{
-    const d=iframe.contentDocument;
-    if(!d||!d.body)return 0;
-    let h=0;
-    const bodyRect=d.body.getBoundingClientRect();
-    h=Math.max(h,bodyRect.height||0);
-    const els=d.body.querySelectorAll('*');
-    for(let i=0;i<els.length;i++){
-      const el=els[i];
-      try{
-        const cs=d.defaultView.getComputedStyle(el);
-        if(cs.display==='none'||cs.visibility==='hidden'||parseFloat(cs.opacity||'1')===0)continue;
-        const r=el.getBoundingClientRect();
-        if(r.width>0&&r.height>0&&r.bottom>0)h=Math.max(h,r.bottom);
-      }catch(e){}
-    }
-    return h;
-  };
-
-  const fit=()=>{
-    try{
-      const available=Math.max(1,wrap.clientWidth||DESIGN_WIDTH);
-      // The ONLY mobile adaptation: scale the complete desktop canvas.
-      const scale=Math.min(1,available/DESIGN_WIDTH);
-      iframe.style.transform='scale('+scale+')';
-
-      const d=iframe.contentDocument;
-      const visualH=getVisualHeight();
-      const scrollH=Math.max(
-        Math.ceil((d&&d.documentElement&&d.documentElement.scrollHeight)||0),
-        Math.ceil((d&&d.body&&d.body.scrollHeight)||0)
-      );
-      // Prefer actual visible content. Never let a previously measured giant
-      // blank canvas keep the slot hundreds of pixels tall.
-      let rawH=Math.max(90,Math.ceil(visualH||0));
-      if(!visualH) rawH=Math.max(90,Math.min(900,Math.ceil(scrollH||0)||250));
-      rawH=Math.min(900,rawH);
-      lastRawH=rawH;
-      iframe.style.height=rawH+'px';
-      wrap.style.height=Math.ceil(rawH*scale)+'px';
-      wrap.style.minHeight=Math.ceil(90*scale)+'px';
-    }catch(e){
-      const available=Math.max(1,wrap.clientWidth||DESIGN_WIDTH);
-      const scale=Math.min(1,available/DESIGN_WIDTH);
-      iframe.style.transform='scale('+scale+')';
-      iframe.style.height=lastRawH+'px';
-      wrap.style.height=Math.ceil(lastRawH*scale)+'px';
-    }
-  };
-
-  iframe.addEventListener('load',()=>{
-    fit();
-    setTimeout(fit,150);
-    setTimeout(fit,500);
-    setTimeout(fit,1200);
-    setTimeout(fit,2500);
-    setTimeout(fit,5000);
-    try{
-      const d=iframe.contentDocument;
-      if(window.ResizeObserver&&d&&d.body){
-        const innerRO=new ResizeObserver(fit);
-        innerRO.observe(d.body);
-      }
-    }catch(e){}
-  });
-  if(window.ResizeObserver){
-    const ro=new ResizeObserver(fit);
-    ro.observe(wrap);
-  }else{
-    window.addEventListener('resize',fit,{passive:true});
-  }
-  setTimeout(fit,0);
-  return wrap;
+function installAdStyles(){
+  if(document.getElementById('sheet-native-ad-styles')) return;
+  const style=document.createElement('style');
+  style.id='sheet-native-ad-styles';
+  style.textContent=`
+.sheet-ad-slot[data-sheet-native="yes"]{
+  width:100%!important;max-width:1200px!important;min-width:0!important;
+  margin:18px auto!important;padding:0!important;border:0!important;
+  overflow:hidden!important;display:block!important;box-sizing:border-box!important;
+  min-height:0!important;height:auto!important;background:transparent!important;
+}
+.sheet-ad-slot[data-sheet-native="yes"] .sheet-native-viewport{
+  width:100%!important;max-width:1200px!important;min-width:0!important;
+  margin:0 auto!important;padding:0!important;overflow:hidden!important;
+  display:block!important;box-sizing:border-box!important;line-height:0!important;
+}
+.sheet-ad-slot[data-sheet-native="yes"] .sheet-native-canvas{
+  width:1200px!important;min-width:1200px!important;max-width:none!important;
+  margin:0!important;padding:0!important;display:block!important;
+  transform-origin:top left!important;position:relative!important;
+  box-sizing:border-box!important;line-height:normal!important;
+}
+.sheet-native-canvas [id^="container-"]{max-width:none!important;}
+`;
+  document.head.appendChild(style);
 }
 
-function imageAdNode(slot,img,click,title){
-  const src=safeUrl(img),href=safeUrl(click),alt=esc(title||'Advertisement');
-  if(!src)return false;
-  const image=document.createElement('img');
-  image.src=src; image.alt=title||'Advertisement'; image.loading='lazy';
-  image.style.cssText='display:block;width:100%;height:auto;max-width:100%;object-fit:contain;border:0;margin:0;padding:0;';
-  if(href){
-    const a=document.createElement('a'); a.href=href; a.target='_blank'; a.rel='noopener noreferrer';
-    a.style.cssText='display:block;width:100%;height:auto;text-decoration:none;'; a.appendChild(image); slot.appendChild(a);
-  }else slot.appendChild(image);
-  return true;
-}
-function render(slot,ad){
-  if(!ad)return false;
-  slot.innerHTML='';
-  if(ad.code){
-    slot.appendChild(makeAdFrame(ad.code,ad.title));
-  }else if(!imageAdNode(slot,ad.image,ad.click,ad.title)){
-    return false;
-  }
-  slot.classList.add('ad-loaded');
-  slot.setAttribute('data-ad-loaded','yes');
-  return true;
+function getSlots(){
+  const all=Array.from(document.querySelectorAll('.ad-slot[data-ad-slot],.ad-slot[data-ad-position],.sheet-ad-slot[data-ad-slot],.sheet-ad-slot[data-ad-position]'));
+  const seen=new Set();
+  return all.filter(s=>{if(seen.has(s))return false;seen.add(s);return true;});
 }
 function canonicalSlotPosition(slot){
   return normalizePosition(slot.getAttribute('data-ad-position')||slot.getAttribute('data-ad-slot')||'');
 }
-function getSlots(){
-  const seen=new Set();
-  return Array.from(document.querySelectorAll('.sheet-ad-slot[data-ad-slot],.sheet-ad-slot[data-ad-position],.ad-slot[data-ad-slot],.ad-slot[data-ad-position]')).filter(s=>{
-    if(seen.has(s))return false;seen.add(s);return true;
-  });
-}
 function mapSlots(slots){
   const explicit=slots.map(canonicalSlotPosition);
-  // Explicit position attributes are authoritative. This is used by Details,
-  // whose four slots are TOP/MIDDLE TOP/MIDDLE BOTTOM/BOTTOM.
-  if(explicit.every(Boolean))return explicit;
-  const count=slots.length;
-  if(count===2)return ['TOP','BOTTOM'];
-  if(count===3)return ['TOP','MIDDLE','BOTTOM'];
-  if(count===4)return ['TOP','MIDDLE_TOP','MIDDLE_BOTTOM','BOTTOM'];
+  if(explicit.every(Boolean)) return explicit;
+  if(slots.length===2) return ['TOP','BOTTOM'];
+  if(slots.length===3) return ['TOP','MIDDLE','BOTTOM'];
+  if(slots.length===4) return ['TOP','MIDDLE_TOP','MIDDLE_BOTTOM','BOTTOM'];
   return [];
 }
-function pick(adSets,pos,used){
-  // Exact position first.
-  let list=adSets[pos]||[];
-  if(list.length){
-    // A position can contain multiple active rows. Cycle through them per page.
-    const i=used[pos]||0; used[pos]=i+1;
-    return list[i%list.length];
-  }
-  // ALL is intentionally reusable: one row can power every slot.
-  list=adSets.ALL||[];
-  if(list.length)return list[0];
-  // Legacy MIDDLE row supports the single MIDDLE slot on index.html.
-  if(pos==='MIDDLE'){
-    list=adSets.MIDDLE||[];
-    if(list.length)return list[0];
-  }
-  // Legacy MIDDLE rows can also fill a missing middle-specific row.
-  if(pos==='MIDDLE_TOP'||pos==='MIDDLE_BOTTOM'){
-    list=adSets.MIDDLE||[];
-    if(list.length){const i=used.MIDDLE||0;used.MIDDLE=i+1;return list[i%list.length];}
+function pick(sets,pos,used){
+  let list=sets[pos]||[];
+  if(list.length){const i=used[pos]||0;used[pos]=i+1;return list[i%list.length];}
+  if((sets.ALL||[]).length) return sets.ALL[0];
+  if(pos==='MIDDLE' && (sets.MIDDLE||[]).length) return sets.MIDDLE[0];
+  if((pos==='MIDDLE_TOP'||pos==='MIDDLE_BOTTOM') && (sets.MIDDLE||[]).length){
+    const i=used.MIDDLE||0;used.MIDDLE=i+1;return sets.MIDDLE[i%(sets.MIDDLE.length)];
   }
   return null;
 }
+
+function appendCreativeCode(canvas,code,title){
+  const template=document.createElement('template');
+  template.innerHTML=String(code||'').trim();
+  const scripts=[];
+  const nodes=Array.from(template.content.childNodes);
+
+  // Put normal nodes in first so a dynamically loaded ad script can always
+  // find its target container, even though the provider's supplied snippet
+  // places the async script before the container.
+  nodes.forEach(node=>{
+    if(node.nodeType===1 && node.tagName.toLowerCase()==='script') scripts.push(node);
+    else canvas.appendChild(node.cloneNode(true));
+  });
+
+  scripts.forEach(old=>{
+    const s=document.createElement('script');
+    for(const attr of Array.from(old.attributes)) s.setAttribute(attr.name,attr.value);
+    if(old.src || old.getAttribute('src')){
+      s.async = old.async || old.getAttribute('async')!==null;
+      s.src = old.src || old.getAttribute('src');
+    }else{
+      s.text = old.text || old.textContent || '';
+    }
+    canvas.appendChild(s);
+  });
+  return true;
+}
+
+function renderNative(slot,ad){
+  if(!ad||!ad.code) return false;
+  if(!/closurenosy\.com/i.test(ad.code)) return false;
+
+  slot.classList.add('sheet-ad-slot');
+  slot.setAttribute('data-sheet-native','yes');
+  slot.setAttribute('data-ad-loaded','yes');
+  slot.innerHTML='';
+
+  const viewport=document.createElement('div');
+  viewport.className='sheet-native-viewport';
+  const canvas=document.createElement('div');
+  canvas.className='sheet-native-canvas';
+  canvas.setAttribute('data-ad-title',ad.title||'Advertisement');
+  viewport.appendChild(canvas);
+  slot.appendChild(viewport);
+
+  const fit=()=>{
+    const w=Math.max(1,viewport.clientWidth||slot.clientWidth||DESIGN_WIDTH);
+    const scale=Math.min(1,w/DESIGN_WIDTH);
+    canvas.style.transform='scale('+scale+')';
+    // Estimate the visible creative height without changing the page layout.
+    let h=250;
+    const children=Array.from(canvas.children);
+    children.forEach(el=>{
+      try{
+        const r=el.getBoundingClientRect();
+        if(r.height) h=Math.max(h,r.height/scale);
+      }catch(e){}
+    });
+    h=Math.min(900,Math.max(90,h));
+    viewport.style.height=Math.ceil(h*scale)+'px';
+  };
+  if(window.ResizeObserver){
+    const ro=new ResizeObserver(fit); ro.observe(viewport);
+  }else window.addEventListener('resize',fit,{passive:true});
+  appendCreativeCode(canvas,ad.code,ad.title);
+  fit();
+  [100,400,1000,2000,4000,7000].forEach(ms=>setTimeout(fit,ms));
+  return true;
+}
+
+function renderImage(slot,ad){
+  const src=safeUrl(ad&&ad.image), href=safeUrl(ad&&ad.click);
+  if(!src) return false;
+  slot.classList.add('sheet-ad-slot');
+  slot.setAttribute('data-sheet-native','yes');
+  slot.setAttribute('data-ad-loaded','yes');
+  slot.innerHTML='';
+  const viewport=document.createElement('div'); viewport.className='sheet-native-viewport';
+  const img=document.createElement('img');
+  img.src=src; img.alt=ad.title||'Advertisement'; img.loading='lazy';
+  img.style.cssText='display:block;width:100%;height:auto;max-width:1200px;margin:0 auto;border:0;';
+  if(href){const a=document.createElement('a');a.href=href;a.target='_blank';a.rel='noopener noreferrer';a.style.display='block';a.appendChild(img);viewport.appendChild(a);}else viewport.appendChild(img);
+  slot.appendChild(viewport); return true;
+}
+
 async function fetchRows(){
   let last;
-  for(let attempt=0;attempt<3;attempt++){
+  for(let i=0;i<3;i++){
     try{
-      const r=await fetch(URL+'&_='+Date.now()+'-'+attempt,{cache:'no-store',credentials:'omit'});
-      if(!r.ok)throw Error('Ads sheet HTTP '+r.status);
+      const r=await fetch(SHEET_URL+'&_='+Date.now()+'-'+i,{cache:'no-store',credentials:'omit'});
+      if(!r.ok) throw new Error('Google Sheet HTTP '+r.status);
       return parse(await r.text());
-    }catch(e){last=e;if(attempt<2)await sleep(700*(attempt+1));}
+    }catch(e){last=e;if(i<2)await sleep(700*(i+1));}
   }
-  throw last||Error('Ads sheet fetch failed');
+  throw last||new Error('Google Sheet unavailable');
 }
+
 async function load(){
+  installAdStyles();
+  const slots=getSlots();
+  if(!slots.length) return;
+  const positions=mapSlots(slots);
+  if(positions.length!==slots.length){console.warn('Ads: unsupported slot layout');return;}
   try{
     const rows=await fetchRows();
-    const ads={TOP:[],MIDDLE:[],MIDDLE_TOP:[],MIDDLE_BOTTOM:[],BOTTOM:[],ALL:[]};
+    const sets={TOP:[],MIDDLE:[],MIDDLE_TOP:[],MIDDLE_BOTTOM:[],BOTTOM:[],ALL:[]};
     rows.forEach(r=>{
       const pos=normalizePosition(val(r,0));
-      if(!pos||!Object.prototype.hasOwnProperty.call(ads,pos)||!active(val(r,1)))return;
-      const ad={code:val(r,5),image:val(r,2),click:val(r,3),title:val(r,4)};
-      if(ad.code||ad.image)ads[pos].push(ad);
+      if(!pos||!Object.prototype.hasOwnProperty.call(sets,pos)||!isActive(val(r,1))) return;
+      const ad={image:val(r,2),click:val(r,3),title:val(r,4),code:val(r,5)};
+      if(ad.code||ad.image) sets[pos].push(ad);
     });
-
-    const slots=getSlots();
-    const positions=mapSlots(slots);
-    if(!positions.length||positions.length!==slots.length){console.warn('Ads loader: unsupported slot layout',slots.length);return;}
 
     const used={TOP:0,MIDDLE:0,MIDDLE_TOP:0,MIDDLE_BOTTOM:0,BOTTOM:0,ALL:0};
+    const usedCode=new Set();
     slots.forEach((slot,i)=>{
       let pos=positions[i];
-      // Legacy generic MIDDLE slots on a 4-slot page become two independent positions.
-      if(pos==='MIDDLE'&&slots.length===4){
-        const middleIndex=positions.slice(0,i+1).filter(x=>x==='MIDDLE').length;
-        pos=middleIndex===1?'MIDDLE_TOP':'MIDDLE_BOTTOM';
+      if(pos==='MIDDLE' && slots.length===4){
+        const n=positions.slice(0,i+1).filter(x=>x==='MIDDLE').length;
+        pos=n===1?'MIDDLE_TOP':'MIDDLE_BOTTOM';
       }
-      const attr=pos.toLowerCase().replace(/_/g,'-');
-      slot.setAttribute('data-ad-position',attr);
-      slot.setAttribute('data-ad-slot',attr);
-      const ad=pick(ads,pos,used);
-      if(ad)render(slot,ad);
-      else slot.setAttribute('data-ad-loaded','no-ad');
+      slot.setAttribute('data-ad-position',pos.toLowerCase().replace(/_/g,'-'));
+      slot.setAttribute('data-ad-slot',pos.toLowerCase().replace(/_/g,'-'));
+      const ad=pick(sets,pos,used);
+      if(!ad){slot.setAttribute('data-ad-loaded','no-ad');return;}
+
+      // The supplied Native Banner uses one fixed container ID. The same
+      // snippet cannot safely exist more than once in one HTML document.
+      // If the Sheet repeats that exact code in multiple rows, render the
+      // first occurrence only; different ad codes may still render separately.
+      if(ad.code && /container-0327a0284d2be31da068607e5bceb134/i.test(ad.code)){
+        const key=ad.code.replace(/\s+/g,' ').trim();
+        if(usedCode.has(key)){
+          slot.innerHTML='';
+          slot.setAttribute('data-ad-loaded','duplicate-native-code');
+          return;
+        }
+        usedCode.add(key);
+      }
+      if(ad.code && renderNative(slot,ad)) return;
+      if(renderImage(slot,ad)) return;
+      slot.setAttribute('data-ad-loaded','no-render');
     });
-  }catch(e){console.warn('Google Sheet Ads load failed:',e);}
+  }catch(e){
+    console.warn('Google Sheet Ads load failed:',e);
+    slots.forEach(s=>s.setAttribute('data-ad-loaded','sheet-error'));
+  }
 }
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',load,{once:true});else load();
+
+if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',load,{once:true});
+else load();
 })();

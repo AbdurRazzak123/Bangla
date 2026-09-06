@@ -601,19 +601,10 @@ body{background:var(--bn-bg)!important;color:var(--bn-ink)!important;}
 }
 </style>
 </style>
-
-<style id="native-ad-final-fix">
-/* ONLY the Native Banner is kept on a fixed desktop canvas. The rest of the site remains responsive. */
-.native-final-slot{width:100%!important;max-width:1200px!important;margin:18px auto!important;padding:0!important;overflow:hidden!important;box-sizing:border-box!important;display:block!important;line-height:0!important;}
-.native-final-canvas{width:1200px!important;min-width:1200px!important;max-width:none!important;transform-origin:top left!important;position:relative!important;display:block!important;overflow:visible!important;}
-.native-final-canvas > div[id^="container-"]{width:1200px!important;min-width:1200px!important;max-width:none!important;}
-@media (max-width:1200px){.native-final-slot{max-width:100vw!important;}.native-final-canvas{transform:scale(calc(100vw / 1200));margin-bottom:calc(-250px + (100vw * 250 / 1200))!important;}}
-</style>
 </head>
 <body>
 <div class="news-ticker"><div class="news-ticker-label">বিশেষ বার্তা</div><div class="news-ticker-track"><span class="news-ticker-text">সত্য ও নির্ভরযোগ্য সংবাদ জানতে চোখ রাখুন বাংলা সংবাদের সঙ্গে—তথ্য যাচাই করে, দায়িত্বশীলতার সঙ্গে প্রতিটি গুরুত্বপূর্ণ খবর পৌঁছে দিতে আমরা আছি আপনাদের পাশে।</span></div></div>
-<div class="ad-slot top native-final-slot" data-native-final="1" aria-label="বিজ্ঞাপন"><div class="native-final-canvas"><script async="async" data-cfasync="false" src="https://closurenosy.com/0327a0284d2be31da068607e5bceb134/invoke.js"></script>
-<div id="container-0327a0284d2be31da068607e5bceb134"></div></div></div>
+<div class="ad-slot top sheet-ad-slot" data-ad-slot="top" aria-label="বিজ্ঞাপন"></div>
 <header class="brand-header"><a href="index.html" class="logo-link" aria-label="বাংলা সংবাদ - হোম"><img src="logo.png" alt="বাংলা সংবাদ লোগো" class="site-brand-logo" loading="eager"></a><p>সর্বশেষ সংবাদ সবার আগে</p></header>
 <div class="details-container">
 <a href="index.html" class="back-btn">← হোমপেজে ফিরে যান</a>
@@ -729,5 +720,8 @@ fetch(jsonUrl+'&_='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{
   media.innerHTML=html;
 }).catch(()=>document.getElementById('news-content').textContent='খবর লোড করতে সমস্যা হয়েছে।');
 </script>
+
+<script src="ads-loader.js?v=20260906-final-sheet-native"></script>
+
 
 </body></html>
